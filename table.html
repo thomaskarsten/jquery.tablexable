@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<head>
+    <title>Tables</title>
+    <script type="text/javascript" src="../../libs/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="jquery.tablesortable.js"></script>
+    <script type="text/javascript" src="jquery.paginatable.js"></script>
+</head>
+<body>
+    <table id="myTable">
+        <thead>
+            <tr>
+                <th>Consecutive Number</th>
+                <th>Character</th>
+                <th>ASCII</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>a</td>
+                <td>97</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>b</td>
+                <td>98</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>c</td>
+                <td>99</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>d</td>
+                <td>100</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>e</td>
+                <td>101</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>f</td>
+                <td>102</td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="pager"></div>
+    <script type="text/javascript">
+        $('#myTable').tablesortable({
+            columnTypes: {0: 'integer', 2: 'integer'}
+        }).paginatable({
+            nItemsPerPage: 4,
+            container: $('#myTable tbody')
+        });
+    </script>
+</body>
+</html>
