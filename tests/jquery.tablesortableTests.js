@@ -150,8 +150,8 @@ test('jQuery.paginatable()', function() {
     });
     ok($obj);
 
-    $navigation = $('#paginatableNavigation');
-    ok($navigation.length);
+    $navigations = $('.pgnNavigation');
+    equal($navigations.length, 2);
 
     var $table = Helpers.getTable();
     equal($table.find('tbody tr:visible').length, 2);
@@ -162,24 +162,59 @@ test('jQuery.paginatable()', function() {
     Helpers.assertVisibleData2ndPage();
 });
 
-test('jQuery.paginatable() buttons accept click events', function() {
+test('jQuery.paginatable() displayPage() works', function() {
+    var $obj = $('#myTable').paginatable({
+        nItemsPerPage: 2,
+        container: $('#myTable tbody')
+    });
+    equal($obj.length, 1);
+
+    var $table = Helpers.getTable();
+    equal($table.find('tbody tr:visible').length, 2);
+    Helpers.assertVisibleData1stPage();
+
+    $obj.paginatable('displayPage', -1);
+    equal($table.find('tbody tr:visible').length, 2);
+    Helpers.assertVisibleData2ndPage();
+
+    $obj.paginatable('displayPage', 0);
+    equal($table.find('tbody tr:visible').length, 2);
+    Helpers.assertVisibleData1stPage();
+
+    $obj.paginatable('displayPage', 1);
+    equal($table.find('tbody tr:visible').length, 2);
+    Helpers.assertVisibleData2ndPage();
+});
+
+test('jQuery.paginatable() buttons exist and accept click events', function() {
     var $obj = $('#myTable').paginatable({
         nItemsPerPage: 2,
         container: $('#myTable tbody')
     });
     ok($obj.length);
 
-
-    $navigation = $('#paginatableNavigation');
-    ok($navigation.length);
+    $navigations = $('.pgnNavigation');
+    equal($navigations.length, 2);
 
     Helpers.assertVisibleData1stPage();
 
-    $nextButton = $navigation.find('li').last();
+    var $topNavigation = $($navigations[0]);
+
+    var $lastPageButton = $topNavigation.find('.pgnBtnLast');
+    equal($lastPageButton.length, 1);
+    $lastPageButton.trigger('click');
+    Helpers.assertVisibleData2ndPage();
+
+    var $firstPageButton = $topNavigation.find('.pgnBtnFirst');
+    equal($firstPageButton.length, 1);
+    $firstPageButton.trigger('click');
+    Helpers.assertVisibleData1stPage();
+
+    $nextButton = $topNavigation.find('.pgnBtnNext');
     $nextButton.trigger('click');
     Helpers.assertVisibleData2ndPage();
 
-    $prevButton = $navigation.find('li').first();
+    $prevButton = $topNavigation.find('.pgnBtnPrev');
     $prevButton.trigger('click');
     Helpers.assertVisibleData1stPage();
 });
@@ -190,12 +225,12 @@ test('jQuery.paginatable() "Prev" button on first page does not change content',
         container: $('#myTable tbody')
     });
 
-    $navigation = $('#paginatableNavigation');
-    ok($navigation.length);
+    $navigations = $('.pgnNavigation');
+    equal($navigations.length, 2);
 
     Helpers.assertVisibleData1stPage();
 
-    $prevButton = $navigation.find('li').first();
+    $prevButton = $($navigations[0]).find('li').first();
     $prevButton.trigger('click');
     Helpers.assertVisibleData1stPage();
 });
@@ -207,15 +242,15 @@ test('jQuery.paginatable() "Next" button on last page does not change content', 
     });
     ok($obj.length);
 
-    $navigation = $('#paginatableNavigation');
-    ok($navigation.length);
+    $navigations = $('.pgnNavigation');
+    equal($navigations.length, 2);
 
     Helpers.assertVisibleData1stPage();
 
     $obj.paginatable('displayPage', 1);
     Helpers.assertVisibleData2ndPage();
 
-    $nextButton = $navigation.find('li').last();
+    $nextButton = $($navigations[0]).find('li').last();
     $nextButton.trigger('click');
     Helpers.assertVisibleData2ndPage();
 });

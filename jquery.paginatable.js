@@ -12,16 +12,18 @@
 
                 methods.initData.call(this);
 
-                var navId = 'paginatableNavigation';
-                var $btnContainer;
+                var navClass = 'pgnNavigation';
+                var $btnContainers;
                 if (settings.containerForButtons)
-                    $btnContainer = settings.containerForButtons;
+                    $btnContainers = settings.containerForButtons;
                 else {
-                    this.append('<div id="' + navId + '"></div>');
-                    $btnContainer = $('#' + navId);
+                    var navigation = '<div class="' + navClass + '"></div>';
+                    this.after(navigation);
+                    this.before(navigation);
+                    $btnContainers = $('.' + navClass);
                 }
 
-                methods.createNavigation.call(this, $btnContainer);
+                methods.createNavigation.call(this, $btnContainers);
                 methods.displayPage.call(this, 0);
 
                 var me = this;
@@ -41,23 +43,31 @@
                 this.data('nItemsPerPage', settings.nItemsPerPage);
             },
 
-            createNavigation: function($container) {
+            createNavigation: function($containers) {
                 var navigation =
                     '<ul>' +
-                        '<li><a href="javascript:void(0)">Prev</a></li>' +
-                        '<li><a href="javascript:void(0)">Next</a></li>' +
+                        '<li><button type="button" class="pgnBtnFirst">First</button></li>' +
+                        '<li><button type="button" class="pgnBtnPrev">Prev</button></li>' +
+                        '<li><button type="button" class="pgnBtnNext">Next</button></li>' +
+                        '<li><button type="button" class="pgnBtnLast">Last</button></li>' +
                     '</ul>';
 
                 var me = this;
-                $container.html(navigation);
-                $buttons = $container.find('li');
-                $prevBtn = $buttons.first();
-                $nextBtn = $buttons.last();
-                $nextBtn.on('click', function() {
-                    methods.displayPage.call(me, me.data('currentPage') + 1);
-                });
-                $prevBtn.on('click', function() {
-                    methods.displayPage.call(me, me.data('currentPage') - 1);
+                $containers.html(navigation);
+                $containers.each(function(index, container) {
+                    $container = $(container);
+                    $container.find('.pgnBtnFirst').on('click', function() {
+                        methods.displayPage.call(me, 0);
+                    });
+                    $container.find('.pgnBtnNext').on('click', function() {
+                        methods.displayPage.call(me, me.data('currentPage') + 1);
+                    });
+                    $container.find('.pgnBtnPrev').on('click', function() {
+                        methods.displayPage.call(me, me.data('currentPage') - 1);
+                    });
+                    $container.find('.pgnBtnLast').on('click', function() {
+                        methods.displayPage.call(me, -1);
+                    });
                 });
             },
 
@@ -66,9 +76,14 @@
                 var $elements = $container.children();
                 var nElements = $elements.length;
                 var nItemsPerPage = this.data('nItemsPerPage');
+                var nPages = Math.ceil(nElements / nItemsPerPage);
 
-                if (pageNo >= Math.ceil(nElements / nItemsPerPage) || pageNo < 0)
-                    return false;
+                if (pageNo == -1)
+                    pageNo = nPages - 1;
+                else {
+                    if (pageNo >= nPages || pageNo < 0)
+                        return false;
+                }
 
                 var currentPage = -1;
                 $elements.each(function(index, element) {
