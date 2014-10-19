@@ -128,6 +128,27 @@ test('jQuery.tablesortable("sort")', function() {
     Helpers.assertIsSortedBySecondColumn(rows);
 });
 
+test('jQuery.tablesortable("getCastedDataAsArray")', function() {
+    var $obj = $('#myTable').tablesortable({
+        columnTypes: {0: 'integer'},
+        columnContainers: {1: 'a'}
+    });
+
+    var values;
+
+    values = $obj.tablesortable('getCastedDataAsArray', 'x', 'Y', 'istring');
+    equal(values[0], 'x');
+    equal(values[1], 'y');
+
+    values = $obj.tablesortable('getCastedDataAsArray', '3', '12', 'integer');
+    equal(values[0], 3);
+    equal(values[1], 12);
+
+    values = $obj.tablesortable('getCastedDataAsArray', '3.14', '12.02', 'float');
+    equal(values[0], 3.14);
+    equal(values[1], 12.02);
+});
+
 test('jQuery.tablesortable() works after clicking the headers', function() {
     var $obj = $('#myTable').tablesortable({
         columnTypes: {0: 'integer'},

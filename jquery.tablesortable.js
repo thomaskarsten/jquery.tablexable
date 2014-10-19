@@ -61,6 +61,20 @@
             ORDER_BY_DESC: 1,
             ORDER_BY_NONE: 2,
 
+            getCastedDataAsArray: function(a, b, type) {
+                if (type == 'integer') {
+                    a = parseInt(a);
+                    b = parseInt(b);
+                } else if (type == 'float') {
+                    a = parseFloat(a);
+                    b = parseFloat(b);
+                } else if (type == 'istring') {
+                    a = a.toLowerCase();
+                    b = b.toLowerCase();
+                }
+                return [a, b];
+            },
+
             sort: function(colNo) {       
                 if (colNo >= this.nCols)
                     return false;
@@ -72,30 +86,19 @@
                 var isSortedAsc = sortStatus.column == colNo &&
                         sortStatus.order == methods.ORDER_BY_ASC;
 
-                var getCastedDataAsArray = function(a, b, type) {
-                    if (type == 'integer') {
-                        a = parseInt(a);
-                        b = parseInt(b);
-                    } else if (type == 'float') {
-                        a = parseFloat(a);
-                        b = parseFloat(b);
-                    }
-                    return [a, b];
-                };
-
                 var me = this;
 
                 if (isSortedAsc) {
                     rows.sort(function(a, b) {
-                        values = getCastedDataAsArray(a.content[colNo], b.content[colNo],
-                                columnType);
+                        values = methods.getCastedDataAsArray(
+                            a.content[colNo], b.content[colNo], columnType);
                         return values[0] < values[1] ? 1 : -1;
                     });
                     sortStatus.order = methods.ORDER_BY_DESC;
                 } else {
                     rows.sort(function(a, b) {
-                        values = getCastedDataAsArray(a.content[colNo], b.content[colNo],
-                                columnType);
+                        values = methods.getCastedDataAsArray(
+                            a.content[colNo], b.content[colNo], columnType);
                         return values[0] < values[1] ? -1 : 1;
                     });
                     sortStatus.order = methods.ORDER_BY_ASC;
