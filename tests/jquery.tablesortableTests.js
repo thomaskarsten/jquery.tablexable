@@ -84,6 +84,16 @@ var Helpers = {
         });
 
         Helpers.assertData(expected, visible);
+    },
+
+    assertCurrentPage: function(expectedPageNo) {
+        $elCurrentPage = $($('.pgnNavigation')[0]).find('.pgnCurrent');
+        equal($elCurrentPage.html(), expectedPageNo);
+    },
+
+    assertTotalPages: function(expectedTotalPages) {
+        $elTotalPages = $($('.pgnNavigation')[0]).find('.pgnTotal');
+        equal($elTotalPages.html(), expectedTotalPages);
     }
 };
 
@@ -156,10 +166,31 @@ test('jQuery.paginatable()', function() {
     var $table = Helpers.getTable();
     equal($table.find('tbody tr:visible').length, 2);
     Helpers.assertVisibleData1stPage();
+    Helpers.assertCurrentPage(1);
 
     $obj.paginatable('displayPage', 1);
     equal($table.find('tbody tr:visible').length, 2);
     Helpers.assertVisibleData2ndPage();
+    Helpers.assertCurrentPage(2);
+
+    Helpers.assertTotalPages(2);
+});
+
+test('jQuery.paginatable() has correct number of elements in navigation', function() {
+    var $obj = $('#myTable').paginatable({
+        nItemsPerPage: 2,
+        container: $('#myTable tbody')
+    });
+    ok($obj.length);
+
+    var $navigation = $($('.pgnNavigation')[0]);
+    ok($navigation.length);
+
+    var navigationItems = ['pgnCurrent', 'pgnTotal', 'pgnBtnFirst',
+        'pgnBtnPrev', 'pgnBtnNext', 'pgnBtnLast'];
+
+    for (var i in navigationItems)
+        equal($navigation.find('.' + navigationItems[i]).length, 1);
 });
 
 test('jQuery.paginatable() displayPage() works', function() {
@@ -172,18 +203,24 @@ test('jQuery.paginatable() displayPage() works', function() {
     var $table = Helpers.getTable();
     equal($table.find('tbody tr:visible').length, 2);
     Helpers.assertVisibleData1stPage();
+    Helpers.assertCurrentPage(1);
 
     $obj.paginatable('displayPage', -1);
     equal($table.find('tbody tr:visible').length, 2);
     Helpers.assertVisibleData2ndPage();
+    Helpers.assertCurrentPage(2);
 
     $obj.paginatable('displayPage', 0);
     equal($table.find('tbody tr:visible').length, 2);
     Helpers.assertVisibleData1stPage();
+    Helpers.assertCurrentPage(1);
 
     $obj.paginatable('displayPage', 1);
     equal($table.find('tbody tr:visible').length, 2);
     Helpers.assertVisibleData2ndPage();
+    Helpers.assertCurrentPage(2);
+
+    Helpers.assertTotalPages(2);
 });
 
 test('jQuery.paginatable() buttons exist and accept click events', function() {

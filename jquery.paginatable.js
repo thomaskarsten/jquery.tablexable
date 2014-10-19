@@ -3,19 +3,17 @@
         var settings = $.extend({
             nItemsPerPage: 10,
             container: '',
-            containerForButtons: '',
+            containerForNavigation: '',
             sigRefreshPages: 'tablesortable.sorted'
         }, methodOrOptions || []);
 
         var methods = {
             init: function() {
 
-                methods.initData.call(this);
-
                 var navClass = 'pgnNavigation';
                 var $btnContainers;
-                if (settings.containerForButtons)
-                    $btnContainers = settings.containerForButtons;
+                if (settings.containerForNavigation)
+                    $btnContainers = settings.containerForNavigation;
                 else {
                     var navigation = '<div class="' + navClass + '"></div>';
                     this.after(navigation);
@@ -24,6 +22,8 @@
                 }
 
                 methods.createNavigation.call(this, $btnContainers);
+                methods.initData.call(this);
+
                 methods.displayPage.call(this, 0);
 
                 var me = this;
@@ -40,12 +40,25 @@
                     this.data('container', settings.container);
                 else
                     this.data('container', this);
+                var $pgnNavigation;
+                if (settings.containerForNavigation) {
+                    this.data('containerForNavigation', settings.containerForNavigation);
+                    $pgnNavigation = settings.containerForNavigation;
+                } else {
+                    $pgnNavigation = $('.pgnNavigation');
+                    this.data('containerForNavigation', $pgnNavigation);
+                }
+
+                this.data('$pgnCurrent', $pgnNavigation.find('.pgnCurrent'));
+                this.data('$pgnTotal', $pgnNavigation.find('.pgnTotal'));
                 this.data('nItemsPerPage', settings.nItemsPerPage);
             },
 
             createNavigation: function($containers) {
                 var navigation =
                     '<ul>' +
+                        '<li><p class="pgnCurrent"></p></li>' +
+                        '<li><p class="pgnTotal"></p></li>' +
                         '<li><button type="button" class="pgnBtnFirst">First</button></li>' +
                         '<li><button type="button" class="pgnBtnPrev">Prev</button></li>' +
                         '<li><button type="button" class="pgnBtnNext">Next</button></li>' +
@@ -97,6 +110,8 @@
                 });
 
                 this.data('currentPage', pageNo);
+                this.data('$pgnCurrent').html(pageNo + 1);
+                this.data('$pgnTotal').html(nPages);
             },
 
             getData: function() {
