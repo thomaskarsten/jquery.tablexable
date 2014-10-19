@@ -168,7 +168,7 @@ test('jQuery.paginatable()', function() {
     Helpers.assertVisibleData1stPage();
     Helpers.assertCurrentPage(1);
 
-    $obj.paginatable('displayPage', 1);
+    $obj.paginatable('displayNextPage');
     equal($table.find('tbody tr:visible').length, 2);
     Helpers.assertVisibleData2ndPage();
     Helpers.assertCurrentPage(2);
@@ -205,17 +205,12 @@ test('jQuery.paginatable() displayPage() works', function() {
     Helpers.assertVisibleData1stPage();
     Helpers.assertCurrentPage(1);
 
-    $obj.paginatable('displayPage', -1);
-    equal($table.find('tbody tr:visible').length, 2);
-    Helpers.assertVisibleData2ndPage();
-    Helpers.assertCurrentPage(2);
-
-    $obj.paginatable('displayPage', 0);
+    $obj.paginatable('displayPrevPage');
     equal($table.find('tbody tr:visible').length, 2);
     Helpers.assertVisibleData1stPage();
     Helpers.assertCurrentPage(1);
 
-    $obj.paginatable('displayPage', 1);
+    $obj.paginatable('displayNextPage');
     equal($table.find('tbody tr:visible').length, 2);
     Helpers.assertVisibleData2ndPage();
     Helpers.assertCurrentPage(2);
@@ -265,9 +260,10 @@ test('jQuery.paginatable() "Prev" button on first page does not change content',
     $navigations = $('.pgnNavigation');
     equal($navigations.length, 2);
 
+    var $topNavigation = $($navigations[0]);
     Helpers.assertVisibleData1stPage();
 
-    $prevButton = $($navigations[0]).find('li').first();
+    $prevButton = $topNavigation.find('.pgnBtnPrev');
     $prevButton.trigger('click');
     Helpers.assertVisibleData1stPage();
 });
@@ -282,12 +278,13 @@ test('jQuery.paginatable() "Next" button on last page does not change content', 
     $navigations = $('.pgnNavigation');
     equal($navigations.length, 2);
 
+    var $topNavigation = $($navigations[0]);
     Helpers.assertVisibleData1stPage();
 
-    $obj.paginatable('displayPage', 1);
+    $obj.paginatable('displayLastPage');
     Helpers.assertVisibleData2ndPage();
 
-    $nextButton = $($navigations[0]).find('li').last();
+    $nextButton = $topNavigation.find('.pgnBtnNext');
     $nextButton.trigger('click');
     Helpers.assertVisibleData2ndPage();
 });

@@ -7,6 +7,12 @@
             sigRefreshPages: 'tablesortable.sorted'
         }, methodOrOptions || []);
 
+        var PGN_CMD_FIRST = 7;
+        var PGN_CMD_PREV = 8;
+        var PGN_CMD_NEXT = 9;
+        var PGN_CMD_LAST = 10;
+        var PGN_CMD_CURRENT = 4;
+
         var methods = {
             init: function() {
 
@@ -24,11 +30,11 @@
                 methods.createNavigation.call(this, $btnContainers);
                 methods.initData.call(this);
 
-                methods.displayPage.call(this, 0);
+                methods.displayPage.call(this, PGN_CMD_FIRST);
 
                 var me = this;
                 this.on(settings.sigRefreshPages, function() {
-                    methods.displayPage.call(me, me.data('currentPage'));
+                    methods.displayPage.call(me, PGN_CMD_CURRENT);
                 });
 
                 return this;
@@ -70,47 +76,69 @@
                 $containers.each(function(index, container) {
                     $container = $(container);
                     $container.find('.pgnBtnFirst').on('click', function() {
-                        methods.displayPage.call(me, 0);
+                        methods.displayPage.call(me, PGN_CMD_FIRST);
                     });
                     $container.find('.pgnBtnNext').on('click', function() {
-                        methods.displayPage.call(me, me.data('currentPage') + 1);
+                        methods.displayPage.call(me, PGN_CMD_NEXT);
                     });
                     $container.find('.pgnBtnPrev').on('click', function() {
-                        methods.displayPage.call(me, me.data('currentPage') - 1);
+                        methods.displayPage.call(me, PGN_CMD_PREV);
                     });
                     $container.find('.pgnBtnLast').on('click', function() {
-                        methods.displayPage.call(me, -1);
+                        methods.displayPage.call(me, PGN_CMD_LAST);
                     });
                 });
             },
 
-            displayPage: function(pageNo) {
+            displayFirstPage: function() {
+                methods.displayPage.call(this, PGN_CMD_FIRST);
+            },
+            displayNextPage: function() {
+                methods.displayPage.call(this, PGN_CMD_NEXT);
+            },
+            displayPrevPage: function() {
+                methods.displayPage.call(this, PGN_CMD_PREV);
+            },
+            displayLastPage: function() {
+                methods.displayPage.call(this, PGN_CMD_LAST);
+            },
+
+            displayPage: function(command) {
                 var $container = this.data('container');
                 var $elements = $container.children();
                 var nElements = $elements.length;
                 var nItemsPerPage = this.data('nItemsPerPage');
                 var nPages = Math.ceil(nElements / nItemsPerPage);
+                var currentPage = this.data('currentPage');
 
-                if (pageNo == -1)
-                    pageNo = nPages - 1;
-                else {
-                    if (pageNo >= nPages || pageNo < 0)
-                        return false;
+                if (command == PGN_CMD_LAST)
+                    currentPage = nPages - 1;
+                else if (command == PGN_CMD_FIRST)
+                    currentPage = 0;
+                else if (command == PGN_CMD_PREV) {
+                    currentPage--;
+                    if (currentPage < 0)
+                        currentPage = 0;
+                } else if (command == PGN_CMD_NEXT) {
+                    currentPage++;
+                    if (currentPage >= nPages)
+                        currentPage = nPages - 1;
+                } else if (command = PGN_CMD_CURRENT) {
                 }
 
-                var currentPage = -1;
+                var visitedPage = -1;
                 $elements.each(function(index, element) {
                     if (index % nItemsPerPage === 0)
-                        currentPage++;
+                        visitedPage++;
 
-                    if (currentPage == pageNo)
+                    if (visitedPage == currentPage)
                         $(this).show();
                     else
                         $(this).hide();
                 });
 
-                this.data('currentPage', pageNo);
-                this.data('$pgnCurrent').html(pageNo + 1);
+                this.data('currentPage', currentPage);
+                this.data('$pgnCurrent').html(currentPage + 1);
                 this.data('$pgnTotal').html(nPages);
             },
 
