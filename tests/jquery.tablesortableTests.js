@@ -358,3 +358,58 @@ test('jQuery.tablesortable().paginatable() work together', function() {
         ['17', '<a href="3">c</a>']
     ]);
 });
+
+QUnit.module('jquery.filterable', {
+    $table: '',
+    FILTER1_TEXT: 'filter1 text',
+    FILTER2_TEXT: 'filter2 text',
+    filterTexts: [
+        [this.FILTER1_TEXT, new RegExp(this.FILTER1_TEXT)],
+        [this.FILTER2_TEXT, new RegExp(this.FILTER2_TEXT)]
+    ],
+    beforeEach: function() {
+        this.$table = $('#filterable');
+        ok(this.$table.length);
+    },
+    afterEach: function() {
+    }
+});
+QUnit.test('settings', function() {
+    this.$table.filterable({
+        hideColumns: [
+            {column: 2, condition: 'False', text: this.FILTER1_TEXT},
+            {column: 3, condition: 'False', text: this.FILTER2_TEXT}
+        ]
+    });
+    var nExpectedCheckboxes = 2;
+
+    var $navigation = $('.filterNavigation');
+    equal($navigation.length, 2);
+    equal($navigation.eq(0).find('[name=filterOption]').length,
+        nExpectedCheckboxes);
+
+    for (var i = 0; i < nExpectedCheckboxes; i++) {
+        var $checkbox = $navigation.eq(0).find('[name=filterOption]').eq(i);
+        equal($checkbox.length, 1);
+        var $label = $checkbox.parent();
+        ok($label.html().match(this.filterTexts[i][1]));
+    }
+});
+
+QUnit.test('filter() works as expected', function() {
+    this.$table.filterable({
+        hideColumns: [
+            {column: 1, condition: 'False', text: this.FILTER1_TEXT},
+            {column: 2, condition: 'False', text: this.FILTER2_TEXT}
+        ],
+        container: $('#filterable tbody')
+    });
+
+    this.$table.filterable('filter', 1, 'False');
+    var $filtered = this.$table.find('tbody tr.filtered');
+    equal($filtered.length, 1);
+
+    this.$table.filterable('filter', 2, 'False');
+    var $filtered = this.$table.find('tbody tr.filtered');
+    equal($filtered.length, 2);
+});
