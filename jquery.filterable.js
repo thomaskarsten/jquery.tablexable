@@ -42,13 +42,16 @@
                 $containers.html($containers.html() + navigation);
 
                 var me = this;
-                var $filters = $containers.find('[name=filterOption]');
-                for (var i = 0; i < settings.hideColumns.length; i++) {
-                    var filterConf = settings.hideColumns[i];
-                    $filters.eq(i).on('change', function() {
-                        me.filter(filterConf.column, filterConf.condition);
+                $containers.each(function(i, container) {
+                    var $filters = $(container).find('[name=filterOption]');
+                    $filters.each(function(i, filter) {
+                        var filterConf = settings.hideColumns[i];
+                        $(filter).on('change', function() {
+                            methods.filter.call(me, filterConf.column,
+                                filterConf.condition);
+                        });
                     });
-                }
+                });
             },
             filter: function(columnNo, condition) {
                 this.data('container').find('tr').each(function() {

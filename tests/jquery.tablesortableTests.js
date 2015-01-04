@@ -335,7 +335,9 @@ test('jQuery.paginatable() refreshes on signal', function() {
 });
 
 QUnit.module('jquery.filterable', {
+    $obj: '',
     $table: '',
+    $navigation: '',
     FILTER1_TEXT: 'filter1 text',
     FILTER2_TEXT: 'filter2 text',
     filterTexts: [
@@ -343,49 +345,54 @@ QUnit.module('jquery.filterable', {
         [this.FILTER2_TEXT, new RegExp(this.FILTER2_TEXT)]
     ],
     beforeEach: function() {
-        this.$table = $('#filterable');
-        ok(this.$table.length);
+        this.$obj = $('#filterable').filterable({
+            hideColumns: [
+                {column: 1, condition: 'False', text: this.FILTER1_TEXT},
+                {column: 2, condition: 'False', text: this.FILTER2_TEXT}
+            ],
+            container: $('#filterable tbody')
+        });
+        this.$navigation = $('.filterNavigation');
+        ok(this.$obj.length);
+        ok(this.$navigation.length);
     },
-    afterEach: function() {
+    clickFilter1: function() {
+        this._clickFilter(0);
+    },
+    clickFilter2: function() {
+        this._clickFilter(1);
+    },
+    _clickFilter: function(i) {
+        var $filter =
+            this.$navigation.eq(0).find('[name=filterOption]').eq(i);
+        $filter.trigger('click');
     }
 });
-QUnit.test('settings', function() {
-    this.$table.filterable({
-        hideColumns: [
-            {column: 2, condition: 'False', text: this.FILTER1_TEXT},
-            {column: 3, condition: 'False', text: this.FILTER2_TEXT}
-        ]
-    });
-    var nExpectedCheckboxes = 2;
 
-    var $navigation = $('.filterNavigation');
-    equal($navigation.length, 2);
-    equal($navigation.eq(0).find('[name=filterOption]').length,
+QUnit.test('settings', function() {
+    var nExpectedCheckboxes = 2;
+    var nExpectedNavigations = 2;
+
+    equal(this.$navigation.length, nExpectedNavigations);
+    equal(this.$navigation.eq(0).find('[name=filterOption]').length,
         nExpectedCheckboxes);
 
     for (var i = 0; i < nExpectedCheckboxes; i++) {
-        var $checkbox = $navigation.eq(0).find('[name=filterOption]').eq(i);
+        var $checkbox =
+            this.$navigation.eq(0).find('[name=filterOption]').eq(i);
         equal($checkbox.length, 1);
         var $label = $checkbox.parent();
         ok($label.html().match(this.filterTexts[i][1]));
     }
 });
 
-QUnit.test('filter() works as expected', function() {
-    this.$table.filterable({
-        hideColumns: [
-            {column: 1, condition: 'False', text: this.FILTER1_TEXT},
-            {column: 2, condition: 'False', text: this.FILTER2_TEXT}
-        ],
-        container: $('#filterable tbody')
-    });
-
-    this.$table.filterable('filter', 1, 'False');
-    var $filtered = this.$table.find('tbody tr.filtered');
+QUnit.test('clicking filter checkbox works as expected', function() {
+    this.clickFilter1();
+    var $filtered = this.$obj.find('tbody tr.filtered');
     equal($filtered.length, 1);
 
-    this.$table.filterable('filter', 2, 'False');
-    var $filtered = this.$table.find('tbody tr.filtered');
+    this.clickFilter2();
+    var $filtered = this.$obj.find('tbody tr.filtered');
     equal($filtered.length, 2);
 });
 
