@@ -24,6 +24,8 @@
                 }
 
                 methods.createNavigation.call(this, $btnContainers);
+
+                return this;
             },
 
             createNavigation: function($containers) {
