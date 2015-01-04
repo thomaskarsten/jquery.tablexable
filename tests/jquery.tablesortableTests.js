@@ -396,6 +396,14 @@ QUnit.test('clicking filter checkbox works as expected', function() {
     equal($filtered.length, 2);
 });
 
+QUnit.test('unclicking filter checkbox resets filtered items', function() {
+    equal(this.$obj.find('tbody tr.filtered').length, 0);
+    this.clickFilter1();
+    equal(this.$obj.find('tbody tr.filtered').length, 1);
+    this.clickFilter1();
+    equal(this.$obj.find('tbody tr.filtered').length, 0);
+});
+
 QUnit.module('all together', {});
 
 test('jQuery.tablesortable().paginatable() work together', function() {

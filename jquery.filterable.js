@@ -47,8 +47,12 @@
                     $filters.each(function(i, filter) {
                         var filterConf = settings.hideColumns[i];
                         $(filter).on('change', function() {
-                            methods.filter.call(me, filterConf.column,
-                                filterConf.condition);
+                            if ($(this).prop('checked')) {
+                                methods.filter.call(me, filterConf.column,
+                                    filterConf.condition);
+                            } else {
+                                methods.unfilter.call(me);
+                            }
                         });
                     });
                 });
@@ -64,6 +68,11 @@
                         $this.addClass('filtered');
                     else
                         $this.removeClass('filtered');
+                });
+            },
+            unfilter: function() {
+                this.data('container').find('tr').each(function() {
+                    $(this).removeClass('filtered');
                 });
             }
         };
