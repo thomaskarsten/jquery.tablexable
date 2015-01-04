@@ -77,7 +77,7 @@ var Helpers = {
     assertVisibleData: function(expected) {
         var $table = Helpers.getTable();
         var visible = [];
-        var $visibleRows = $table.find('tbody tr:visible');
+        var $visibleRows = $table.find('tbody tr.pgnCurrentPage');
         $visibleRows.each(function(index, element) {
             var $tds = $(element).find('td');
             visible.push([$($tds[0]).html(), $($tds[1]).html()]);
@@ -96,6 +96,8 @@ var Helpers = {
         equal($elTotalPages.html(), expectedTotalPages);
     }
 };
+
+QUnit.module('jquery.tablesortable', {});
 
 test('jQuery.tablesortable()', function() {
     var $obj = $('#myTable').tablesortable({columnContainers: {1: 'a'}});
@@ -174,23 +176,25 @@ test('jQuery.tablesortable() works after clicking the headers', function() {
     Helpers.assertIsSortedBySecondColumn(rows);
 }); 
 
+QUnit.module('jquery.paginatable', {});
+
 test('jQuery.paginatable()', function() {
     var $obj = $('#myTable').paginatable({
         nItemsPerPage: 2,
         container: $('#myTable tbody')
     });
-    ok($obj);
+    ok($obj.length);
 
     $navigations = $('.pgnNavigation');
     equal($navigations.length, 2);
 
     var $table = Helpers.getTable();
-    equal($table.find('tbody tr:visible').length, 2);
+    equal($table.find('tbody tr.pgnCurrentPage').length, 2);
     Helpers.assertVisibleData1stPage();
     Helpers.assertCurrentPage(1);
 
     $obj.paginatable('displayNextPage');
-    equal($table.find('tbody tr:visible').length, 2);
+    equal($table.find('tbody tr.pgnCurrentPage').length, 2);
     Helpers.assertVisibleData2ndPage();
     Helpers.assertCurrentPage(2);
 
@@ -222,17 +226,17 @@ test('jQuery.paginatable() displayPage() works', function() {
     equal($obj.length, 1);
 
     var $table = Helpers.getTable();
-    equal($table.find('tbody tr:visible').length, 2);
+    equal($table.find('tbody tr.pgnCurrentPage').length, 2);
     Helpers.assertVisibleData1stPage();
     Helpers.assertCurrentPage(1);
 
     $obj.paginatable('displayPrevPage');
-    equal($table.find('tbody tr:visible').length, 2);
+    equal($table.find('tbody tr.pgnCurrentPage').length, 2);
     Helpers.assertVisibleData1stPage();
     Helpers.assertCurrentPage(1);
 
     $obj.paginatable('displayNextPage');
-    equal($table.find('tbody tr:visible').length, 2);
+    equal($table.find('tbody tr.pgnCurrentPage').length, 2);
     Helpers.assertVisibleData2ndPage();
     Helpers.assertCurrentPage(2);
 
@@ -330,35 +334,6 @@ test('jQuery.paginatable() refreshes on signal', function() {
     Helpers.assertVisibleData([[3, 'x'], [7, 'y']]);
 });
 
-test('jQuery.tablesortable().paginatable() work together', function() {
-    var $obj = $('#myTable').tablesortable({
-        columnTypes: {0: 'integer'},
-        columnContainers: {1: 'a'}
-    }).paginatable({
-        nItemsPerPage: 2,
-        container: $('#myTable tbody')
-    });
-    ok($obj.length);
-    var rows = $obj.tablesortable('getData')['rows'];
-
-    var $firstColumn = Helpers.getTable().find('thead tr th').first();
-    var $secondColumn = $firstColumn.next();
-
-    $firstColumn.trigger('click');
-    Helpers.assertIsSortedByFirstColumn(rows);
-    Helpers.assertVisibleData([
-        ['3', '<a href="9">a</a>'],
-        ['4', '<a href="0">d</a>']
-    ]);
-
-    $secondColumn.trigger('click');
-    Helpers.assertIsSortedBySecondColumn(rows);
-    Helpers.assertVisibleData([
-        ['3', '<a href="9">a</a>'],
-        ['17', '<a href="3">c</a>']
-    ]);
-});
-
 QUnit.module('jquery.filterable', {
     $table: '',
     FILTER1_TEXT: 'filter1 text',
@@ -412,4 +387,35 @@ QUnit.test('filter() works as expected', function() {
     this.$table.filterable('filter', 2, 'False');
     var $filtered = this.$table.find('tbody tr.filtered');
     equal($filtered.length, 2);
+});
+
+QUnit.module('all together', {});
+
+test('jQuery.tablesortable().paginatable() work together', function() {
+    var $obj = $('#myTable').tablesortable({
+        columnTypes: {0: 'integer'},
+        columnContainers: {1: 'a'}
+    }).paginatable({
+        nItemsPerPage: 2,
+        container: $('#myTable tbody')
+    });
+    ok($obj.length);
+    var rows = $obj.tablesortable('getData')['rows'];
+
+    var $firstColumn = Helpers.getTable().find('thead tr th').first();
+    var $secondColumn = $firstColumn.next();
+
+    $firstColumn.trigger('click');
+    Helpers.assertIsSortedByFirstColumn(rows);
+    Helpers.assertVisibleData([
+        ['3', '<a href="9">a</a>'],
+        ['4', '<a href="0">d</a>']
+    ]);
+
+    $secondColumn.trigger('click');
+    Helpers.assertIsSortedBySecondColumn(rows);
+    Helpers.assertVisibleData([
+        ['3', '<a href="9">a</a>'],
+        ['17', '<a href="3">c</a>']
+    ]);
 });

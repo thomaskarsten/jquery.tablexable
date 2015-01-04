@@ -131,10 +131,13 @@
                     if (index % nItemsPerPage === 0)
                         visitedPage++;
 
-                    if (visitedPage == currentPage)
-                        $(this).show();
-                    else
-                        $(this).hide();
+                    if (visitedPage == currentPage) {
+                        $(this).addClass('pgnCurrentPage')
+                            .removeClass('pgnOtherPage');
+                    } else {
+                        $(this).addClass('pgnOtherPage')
+                            .removeClass('pgnCurrentPage');
+                    }
                 });
 
                 this.data('currentPage', currentPage);
