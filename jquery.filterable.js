@@ -7,6 +7,8 @@
         }, methodOrOptions || []);
 
         var methods = {
+            CLASS_FILTERED: 'filtered',
+            CLASS_BY_FILTER_X: 'byFilter',
             init: function() {
                 var navClass = 'filterNavigation';
                 var $btnContainers;
@@ -44,35 +46,43 @@
                 var me = this;
                 $containers.each(function(i, container) {
                     var $filters = $(container).find('[name=filterOption]');
-                    $filters.each(function(i, filter) {
-                        var filterConf = settings.hideColumns[i];
+                    $filters.each(function(j, filter) {
+                        var filterConf = settings.hideColumns[j];
                         $(filter).on('change', function() {
                             if ($(this).prop('checked')) {
-                                methods.filter.call(me, filterConf.column,
+                                methods.filter.call(me, j, filterConf.column,
                                     filterConf.condition);
                             } else {
-                                methods.unfilter.call(me);
+                                methods.unfilter.call(me, j);
                             }
                         });
                     });
                 });
             },
-            filter: function(columnNo, condition) {
+            filter: function(filterNo, columnNo, condition) {
                 this.data('container').find('tr').each(function() {
                     var $this = $(this);
                     $tds = $this.find('td');
                     if ($tds.length < columnNo)
                         return false;
 
-                    if ($tds.eq(columnNo).html() == condition)
-                        $this.addClass('filtered');
-                    else
-                        $this.removeClass('filtered');
+                    if ($tds.eq(columnNo).html() == condition) {
+                        $this.addClass(methods.CLASS_FILTERED).addClass(
+                            methods.CLASS_BY_FILTER_X + filterNo);
+                    }
                 });
             },
-            unfilter: function() {
+            unfilter: function(filterNo) {
+                var byFilterRegex = new RegExp(methods.CLASS_BY_FILTER_X);
+                var filterClass;
                 this.data('container').find('tr').each(function() {
-                    $(this).removeClass('filtered');
+                    var $this = $(this);
+                    if (typeof $this.attr('class') == 'undefined')
+                        return true;
+
+                    $this.removeClass(methods.CLASS_BY_FILTER_X + filterNo);
+                    if (!$this.attr('class').match(byFilterRegex))
+                        $this.removeClass(methods.CLASS_FILTERED);
                 });
             }
         };

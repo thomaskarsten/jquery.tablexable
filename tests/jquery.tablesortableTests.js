@@ -404,6 +404,17 @@ QUnit.test('unclicking filter checkbox resets filtered items', function() {
     equal(this.$obj.find('tbody tr.filtered').length, 0);
 });
 
+QUnit.test('multiple filters use different additional CSS classes', function() {
+    this.clickFilter1();
+    equal(this.$obj.find('tbody tr.filtered').length, 1);
+    this.clickFilter2();
+    equal(this.$obj.find('tbody tr.filtered').length, 2);
+    this.clickFilter2();
+    equal(this.$obj.find('tbody tr.filtered').length, 1);
+    this.clickFilter1();
+    equal(this.$obj.find('tbody tr.filtered').length, 0);
+});
+
 QUnit.module('all together', {});
 
 test('jQuery.tablesortable().paginatable() work together', function() {
