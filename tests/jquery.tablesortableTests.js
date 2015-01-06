@@ -23,12 +23,15 @@ var Helpers = {
     },
     assertIsSortedByFirstColumn: function(data, desc) {
         var $table = Helpers.getTable();
-        var expectedData = [['3', 'a'], ['4', 'd'], ['7', 'f'], ['17', 'c']];
+        var expectedData = [
+            ['3', 'a', 'True', 'True'], ['4', 'd', 'True', 'False'],
+            ['7', 'f', 'False', 'False'], ['17', 'c', 'True', 'False']
+        ];
         var expectedHtml = [
-            ['3', '<a href="9">a</a>'],
-            ['4', '<a href="0">d</a>'],
-            ['7', '<a href="1">f</a>'],
-            ['17', '<a href="3">c</a>']
+            ['3', '<a href="9">a</a>', 'True', 'True'],
+            ['4', '<a href="0">d</a>', 'True', 'False'],
+            ['7', '<a href="1">f</a>', 'False', 'False'],
+            ['17', '<a href="3">c</a>', 'True', 'False']
         ];
 
         if (typeof desc != 'undefined' && desc == true) {
@@ -41,12 +44,15 @@ var Helpers = {
     },
     assertIsSortedBySecondColumn: function(data, desc) {
         var $table = Helpers.getTable();
-        var expectedData = [['3', 'a'], ['17', 'c'], ['4', 'd'], ['7', 'f']];
+        var expectedData = [
+            ['3', 'a', 'True', 'True'], ['17', 'c', 'True', 'False'],
+            ['4', 'd', 'True', 'False'], ['7', 'f', 'False', 'False']
+        ];
         var expectedHtml = [
-            ['3', '<a href="9">a</a>'],
-            ['17', '<a href="3">c</a>'],
-            ['4', '<a href="0">d</a>'],
-            ['7', '<a href="1">f</a>']
+            ['3', '<a href="9">a</a>', 'True', 'True'],
+            ['17', '<a href="3">c</a>', 'True', 'False'],
+            ['4', '<a href="0">d</a>', 'True', 'False'],
+            ['7', '<a href="1">f</a>', 'False', 'False'],
         ];
 
         if (typeof desc != 'undefined' && desc == true) {
@@ -58,26 +64,27 @@ var Helpers = {
         Helpers.assertTable(expectedHtml, $table);
     },
 
-    assertVisibleData1stPage: function() {
+    assertCurrentPageData1stPage: function() {
         var expected = [
             ['17', '<a href="3">c</a>'],
             ['3', '<a href="9">a</a>']
         ];
-        Helpers.assertVisibleData(expected);
+        Helpers.assertCurrentPageData(expected);
     },
 
-    assertVisibleData2ndPage: function() {
+    assertCurrentPageData2ndPage: function() {
         var expected = [
             ['7', '<a href="1">f</a>'],
             ['4', '<a href="0">d</a>']
         ];
-        Helpers.assertVisibleData(expected);
+        Helpers.assertCurrentPageData(expected);
     },
 
-    assertVisibleData: function(expected) {
+    assertCurrentPageData: function(expected) {
         var $table = Helpers.getTable();
         var visible = [];
-        var $visibleRows = $table.find('tbody tr.pgnCurrentPage');
+        var $visibleRows = $table.find('tbody tr.pgnCurrentPage')
+            .not('.filtered');
         $visibleRows.each(function(index, element) {
             var $tds = $(element).find('td');
             visible.push([$($tds[0]).html(), $($tds[1]).html()]);
@@ -104,7 +111,7 @@ test('jQuery.tablesortable()', function() {
     ok($obj.length);
     var data = $obj.tablesortable('getData');
     equal(data['rows'].length, 4);
-    equal(data['columnTypes'].length, 2);
+    equal(data['columnTypes'].length, 4);
     equal(data['sortStatus'].column, 0);
     equal(data['sortStatus'].order, 2);
 });
@@ -190,12 +197,12 @@ test('jQuery.paginatable()', function() {
 
     var $table = Helpers.getTable();
     equal($table.find('tbody tr.pgnCurrentPage').length, 2);
-    Helpers.assertVisibleData1stPage();
+    Helpers.assertCurrentPageData1stPage();
     Helpers.assertCurrentPage(1);
 
     $obj.paginatable('displayNextPage');
     equal($table.find('tbody tr.pgnCurrentPage').length, 2);
-    Helpers.assertVisibleData2ndPage();
+    Helpers.assertCurrentPageData2ndPage();
     Helpers.assertCurrentPage(2);
 
     Helpers.assertTotalPages(2);
@@ -227,17 +234,17 @@ test('jQuery.paginatable() displayPage() works', function() {
 
     var $table = Helpers.getTable();
     equal($table.find('tbody tr.pgnCurrentPage').length, 2);
-    Helpers.assertVisibleData1stPage();
+    Helpers.assertCurrentPageData1stPage();
     Helpers.assertCurrentPage(1);
 
     $obj.paginatable('displayPrevPage');
     equal($table.find('tbody tr.pgnCurrentPage').length, 2);
-    Helpers.assertVisibleData1stPage();
+    Helpers.assertCurrentPageData1stPage();
     Helpers.assertCurrentPage(1);
 
     $obj.paginatable('displayNextPage');
     equal($table.find('tbody tr.pgnCurrentPage').length, 2);
-    Helpers.assertVisibleData2ndPage();
+    Helpers.assertCurrentPageData2ndPage();
     Helpers.assertCurrentPage(2);
 
     Helpers.assertTotalPages(2);
@@ -253,27 +260,27 @@ test('jQuery.paginatable() buttons exist and accept click events', function() {
     $navigations = $('.pgnNavigation');
     equal($navigations.length, 2);
 
-    Helpers.assertVisibleData1stPage();
+    Helpers.assertCurrentPageData1stPage();
 
     var $topNavigation = $($navigations[0]);
 
     var $lastPageButton = $topNavigation.find('.pgnBtnLast');
     equal($lastPageButton.length, 1);
     $lastPageButton.trigger('click');
-    Helpers.assertVisibleData2ndPage();
+    Helpers.assertCurrentPageData2ndPage();
 
     var $firstPageButton = $topNavigation.find('.pgnBtnFirst');
     equal($firstPageButton.length, 1);
     $firstPageButton.trigger('click');
-    Helpers.assertVisibleData1stPage();
+    Helpers.assertCurrentPageData1stPage();
 
     $nextButton = $topNavigation.find('.pgnBtnNext');
     $nextButton.trigger('click');
-    Helpers.assertVisibleData2ndPage();
+    Helpers.assertCurrentPageData2ndPage();
 
     $prevButton = $topNavigation.find('.pgnBtnPrev');
     $prevButton.trigger('click');
-    Helpers.assertVisibleData1stPage();
+    Helpers.assertCurrentPageData1stPage();
 });
 
 test('jQuery.paginatable() "Prev" button on first page does not change content', function() {
@@ -286,11 +293,11 @@ test('jQuery.paginatable() "Prev" button on first page does not change content',
     equal($navigations.length, 2);
 
     var $topNavigation = $($navigations[0]);
-    Helpers.assertVisibleData1stPage();
+    Helpers.assertCurrentPageData1stPage();
 
     $prevButton = $topNavigation.find('.pgnBtnPrev');
     $prevButton.trigger('click');
-    Helpers.assertVisibleData1stPage();
+    Helpers.assertCurrentPageData1stPage();
 });
 
 test('jQuery.paginatable() "Next" button on last page does not change content', function() {
@@ -304,14 +311,14 @@ test('jQuery.paginatable() "Next" button on last page does not change content', 
     equal($navigations.length, 2);
 
     var $topNavigation = $($navigations[0]);
-    Helpers.assertVisibleData1stPage();
+    Helpers.assertCurrentPageData1stPage();
 
     $obj.paginatable('displayLastPage');
-    Helpers.assertVisibleData2ndPage();
+    Helpers.assertCurrentPageData2ndPage();
 
     $nextButton = $topNavigation.find('.pgnBtnNext');
     $nextButton.trigger('click');
-    Helpers.assertVisibleData2ndPage();
+    Helpers.assertCurrentPageData2ndPage();
 });
 
 test('jQuery.paginatable() refreshes on signal', function() {
@@ -322,7 +329,7 @@ test('jQuery.paginatable() refreshes on signal', function() {
     });
     ok($obj.length);
 
-    Helpers.assertVisibleData1stPage();
+    Helpers.assertCurrentPageData1stPage();
 
     $('#myTable tbody').empty();
     $('#myTable tbody').html(
@@ -331,7 +338,7 @@ test('jQuery.paginatable() refreshes on signal', function() {
         '<tr><td>1</td><td>z</td></tr>'
     );
     $obj.trigger('tablesortable.sorted');
-    Helpers.assertVisibleData([[3, 'x'], [7, 'y']]);
+    Helpers.assertCurrentPageData([[3, 'x'], [7, 'y']]);
 });
 
 QUnit.module('jquery.filterable', {
@@ -415,33 +422,123 @@ QUnit.test('multiple filters use different additional CSS classes', function() {
     equal(this.$obj.find('tbody tr.filtered').length, 0);
 });
 
-QUnit.module('all together', {});
+QUnit.module('jquery.tablesortable.paginatable.filterable', {
+    $obj: '',
+    $firstColumnHeader: '',
+    $secondColumnHeader: '',
+    $filterNavigation: '',
+    FILTER1_TEXT: 'filter1 text',
+    FILTER2_TEXT: 'filter2 text',
+    $pageNavigation: '',
+    beforeEach: function() {
+        this.$obj = $('#myTable').tablesortable({
+            columnTypes: {0: 'integer'},
+            columnContainers: {1: 'a'}
+        }).paginatable({
+            nItemsPerPage: 2,
+            container: $('#myTable tbody')
+        }).filterable({
+            hideColumns: [
+                {column: 2, condition: 'False', text: this.FILTER1_TEXT},
+                {column: 3, condition: 'False', text: this.FILTER2_TEXT}
+            ],
+            container: $('#myTable tbody')
+        });
+        ok(this.$obj.length);
 
-test('jQuery.tablesortable().paginatable() work together', function() {
-    var $obj = $('#myTable').tablesortable({
-        columnTypes: {0: 'integer'},
-        columnContainers: {1: 'a'}
-    }).paginatable({
-        nItemsPerPage: 2,
-        container: $('#myTable tbody')
-    });
-    ok($obj.length);
-    var rows = $obj.tablesortable('getData')['rows'];
+        this.$firstColumnHeader =
+            Helpers.getTable().find('thead tr th').first();
+        this.$secondColumnHeader = this.$firstColumnHeader.next();
 
-    var $firstColumn = Helpers.getTable().find('thead tr th').first();
-    var $secondColumn = $firstColumn.next();
+        this.$filterNavigation = $('.filterNavigation').eq(0);
+        ok(this.$filterNavigation.length);
 
-    $firstColumn.trigger('click');
+        this.$pageNavigation = $('.pgnNavigation').eq(0);
+        ok(this.$pageNavigation.length);
+    },
+    nextPage: function() {
+        this.$pageNavigation.find('.pgnBtnNext').trigger('click');
+    },
+    prevPage: function() {
+        this.$pageNavigation.find('.pgnBtnPrev').trigger('click');
+    },
+    sortByColumn1: function() {
+        this.$firstColumnHeader.trigger('click');
+    },
+    sortByColumn2: function() {
+        this.$secondColumnHeader.trigger('click');
+    },
+    clickFilter1: function() {
+        this._clickFilter(0);
+    },
+    clickFilter2: function() {
+        this._clickFilter(1);
+    },
+    _clickFilter: function(i) {
+        var $filter =
+            this.$filterNavigation.eq(0).find('[name=filterOption]').eq(i);
+        $filter.trigger('click');
+    }
+});
+
+QUnit.test('pagination works with sorting', function() {
+    var rows = this.$obj.tablesortable('getData')['rows'];
+
+    this.sortByColumn1();
     Helpers.assertIsSortedByFirstColumn(rows);
-    Helpers.assertVisibleData([
+    Helpers.assertCurrentPageData([
         ['3', '<a href="9">a</a>'],
         ['4', '<a href="0">d</a>']
     ]);
 
-    $secondColumn.trigger('click');
+    this.sortByColumn2();
     Helpers.assertIsSortedBySecondColumn(rows);
-    Helpers.assertVisibleData([
+    Helpers.assertCurrentPageData([
         ['3', '<a href="9">a</a>'],
+        ['17', '<a href="3">c</a>']
+    ]);
+});
+
+QUnit.test('pagination + filtering: number of pages decreases and increases' +
+        ' properly with filtered data', function() {
+
+    var confirmPage1Data = function() {
+        Helpers.assertCurrentPageData([['3', '<a href="9">a</a>']]);
+    };
+
+    this.sortByColumn1();
+    this.clickFilter2();
+
+    confirmPage1Data();
+    this.nextPage();
+    confirmPage1Data();
+    this.prevPage();
+    confirmPage1Data();
+
+    this.clickFilter2();
+    Helpers.assertCurrentPageData([
+        ['3', '<a href="9">a</a>'],
+        ['4', '<a href="0">d</a>']
+    ]);
+
+    this.nextPage();
+    Helpers.assertCurrentPageData([
+        ['7', '<a href="1">f</a>'],
+        ['17', '<a href="3">c</a>']
+    ]);
+});
+
+QUnit.test('pagination + filtering: filtered items are excluded', function() {
+
+    this.sortByColumn1();
+    this.clickFilter1();
+    Helpers.assertCurrentPageData([
+        ['3', '<a href="9">a</a>'],
+        ['4', '<a href="0">d</a>']
+    ]);
+
+    this.nextPage();
+    Helpers.assertCurrentPageData([
         ['17', '<a href="3">c</a>']
     ]);
 });

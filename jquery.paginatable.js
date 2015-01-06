@@ -105,7 +105,7 @@
 
             displayPage: function(command) {
                 var $container = this.data('container');
-                var $elements = $container.children();
+                var $elements = $container.children().not('.filtered');
                 var nElements = $elements.length;
                 var nItemsPerPage = this.data('nItemsPerPage');
                 var nPages = Math.ceil(nElements / nItemsPerPage);
