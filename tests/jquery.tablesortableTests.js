@@ -83,8 +83,7 @@ var Helpers = {
     assertCurrentPageData: function(expected) {
         var $table = Helpers.getTable();
         var visible = [];
-        var $visibleRows = $table.find('tbody tr.pgnCurrentPage')
-            .not('.filtered');
+        var $visibleRows = $table.find('tbody tr.pgnCurrentPage');
         $visibleRows.each(function(index, element) {
             var $tds = $(element).find('td');
             visible.push([$($tds[0]).html(), $($tds[1]).html()]);
@@ -508,8 +507,8 @@ QUnit.test('pagination + filtering: number of pages decreases and increases' +
 
     this.sortByColumn1();
     this.clickFilter2();
-
     confirmPage1Data();
+
     this.nextPage();
     confirmPage1Data();
     this.prevPage();
@@ -538,6 +537,19 @@ QUnit.test('pagination + filtering: filtered items are excluded', function() {
     ]);
 
     this.nextPage();
+    Helpers.assertCurrentPageData([
+        ['17', '<a href="3">c</a>']
+    ]);
+});
+
+QUnit.test('pagination + filtering: pagination gets updated after new' +
+        ' filtering', function() {
+
+    this.sortByColumn1();
+
+    this.nextPage();
+    this.clickFilter1();
+
     Helpers.assertCurrentPageData([
         ['17', '<a href="3">c</a>']
     ]);

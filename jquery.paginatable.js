@@ -1,10 +1,13 @@
 ;(function($) {
     $.fn.paginatable = function(methodOrOptions) {
+
+        var SIG_REFRESH = 'paginatable.refresh';
+
         var settings = $.extend({
             nItemsPerPage: 10,
             container: '',
             containerForNavigation: '',
-            sigRefreshPages: 'tablesortable.sorted'
+            sigRefreshPages: 'tablesortable.sorted ' + SIG_REFRESH
         }, methodOrOptions || []);
 
         var PGN_CMD_FIRST = 7;
@@ -106,6 +109,7 @@
             displayPage: function(command) {
                 var $container = this.data('container');
                 var $elements = $container.children().not('.filtered');
+                var $filteredElements = $container.find('.filtered');
                 var nElements = $elements.length;
                 var nItemsPerPage = this.data('nItemsPerPage');
                 var nPages = Math.ceil(nElements / nItemsPerPage);
@@ -125,6 +129,9 @@
                         currentPage = nPages - 1;
                 } else if (command = PGN_CMD_CURRENT) {
                 }
+
+                $filteredElements.removeClass('pgnCurrentPage')
+                    .addClass('pgnOtherPage');
 
                 var visitedPage = -1;
                 $elements.each(function(index, element) {

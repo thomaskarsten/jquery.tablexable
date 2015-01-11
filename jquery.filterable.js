@@ -1,5 +1,8 @@
 ;(function($) {
     $.fn.filterable = function(methodOrOptions) {
+
+        var SIG_PGN_REFRESH = 'paginatable.refresh';
+
         var settings = $.extend({
             container: '',
             containerForNavigation: '',
@@ -71,6 +74,7 @@
                             methods.CLASS_BY_FILTER_X + filterNo);
                     }
                 });
+                methods.signalPaginatable.call(this);
             },
             unfilter: function(filterNo) {
                 var byFilterRegex = new RegExp(methods.CLASS_BY_FILTER_X);
@@ -84,6 +88,10 @@
                     if (!$this.attr('class').match(byFilterRegex))
                         $this.removeClass(methods.CLASS_FILTERED);
                 });
+                methods.signalPaginatable.call(this);
+            },
+            signalPaginatable: function() {
+                this.trigger(SIG_PGN_REFRESH);
             }
         };
 
