@@ -47,18 +47,23 @@
                 $containers.html($containers.html() + navigation);
 
                 var me = this;
-                $containers.each(function(i, container) {
-                    var $filters = $(container).find('[name=filterOption]');
-                    $filters.each(function(j, filter) {
-                        var filterConf = settings.hideColumns[j];
-                        $(filter).on('change', function() {
-                            if ($(this).prop('checked')) {
-                                methods.filter.call(me, j, filterConf.column,
-                                    filterConf.condition);
-                            } else {
-                                methods.unfilter.call(me, j);
-                            }
-                        });
+                var nContainers = $containers.length;
+                var $filters = $containers.find('[name=filterOption]');
+                var filtersPerContainer = $filters.length / nContainers;
+                $filters.each(function(i, filter) {
+                    var filterNo = i % filtersPerContainer;
+                    var filterConf = settings.hideColumns[filterNo];
+                    $(filter).on('change', function() {
+                        if ($(this).prop('checked')) {
+                            methods.syncRelatedCheckboxes.call(me, true,
+                                $filters, filterNo, nContainers);
+                            methods.filter.call(me, filterNo,
+                                filterConf.column, filterConf.condition);
+                        } else {
+                            methods.syncRelatedCheckboxes.call(me, false,
+                                $filters, filterNo, nContainers);
+                            methods.unfilter.call(me, filterNo);
+                        }
                     });
                 });
             },
@@ -92,6 +97,13 @@
             },
             signalPaginatable: function() {
                 this.trigger(SIG_PGN_REFRESH);
+            },
+            syncRelatedCheckboxes: function(checked, $filters, filterNo,
+                    nContainers) {
+                for (var j = 0; j < nContainers; j++) {
+                    $filters.eq(filterNo + j * nContainers)
+                        .prop('checked', checked);
+                }
             }
         };
 

@@ -342,7 +342,6 @@ test('jQuery.paginatable() refreshes on signal', function() {
 
 QUnit.module('jquery.filterable', {
     $obj: '',
-    $table: '',
     $navigation: '',
     FILTER1_TEXT: 'filter1 text',
     FILTER2_TEXT: 'filter2 text',
@@ -400,6 +399,29 @@ QUnit.test('clicking filter checkbox works as expected', function() {
     this.clickFilter2();
     var $filtered = this.$obj.find('tbody tr.filtered');
     equal($filtered.length, 2);
+});
+
+QUnit.test('clicking filter checkbox checks related checkboxes in different' +
+        ' filter navigations', function() {
+    var $filterNavigations = $('.filterNavigation');
+    equal($filterNavigations.length, 2);
+
+    var confirmCheckboxesAreChecked = function(checked, i) {
+        $filterNavigations.each(function() {
+            var $checkBox = $(this).find('input[type=checkbox]').eq(i);
+            equal($checkBox.prop('checked'), checked);
+        });
+    };
+
+    this.clickFilter1();
+    confirmCheckboxesAreChecked(true, 0);
+    this.clickFilter1();
+    confirmCheckboxesAreChecked(false, 0);
+
+    this.clickFilter2();
+    confirmCheckboxesAreChecked(true, 1);
+    this.clickFilter2();
+    confirmCheckboxesAreChecked(false, 1);
 });
 
 QUnit.test('unclicking filter checkbox resets filtered items', function() {
