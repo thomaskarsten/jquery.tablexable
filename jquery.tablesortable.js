@@ -15,22 +15,19 @@
                 data = [];
                 var $rows = this.find('tbody tr');
                 var nRows = $rows.length;
-                var raw, cols, container;
+                var cols, container;
                 for (var i = 0; i < nRows; i++) {
-                    raw = '';
                     cols = [];
                     
-                    $cols = $($rows[i]).find('td');
+                    $cols = $rows.eq(i).find('td');
                     for (var j = 0; j < $cols.length; j++) {
                         container = settings.columnContainers[j];
                         if (container)
-                            cols.push($($cols[j]).find(container).html());
+                            cols.push($cols.eq(j).find(container).html());
                         else
-                            cols.push($($cols[j]).html());
-
-                        raw += $cols[j].outerHTML;
+                            cols.push($cols.eq(j).html());
                     }
-                    data.push({content: cols, raw: raw});
+                    data.push({content: cols, raw: $rows.eq(i)});
                 }
 
                 this.data('rows', data);
@@ -118,7 +115,7 @@
                 for (var i = 0; i < rows.length; i++) {
                     if (rows[i].length == 0)
                         continue;
-                    $tbody.append('<tr>' + rows[i].raw + '</tr>');
+                    $tbody.append(rows[i].raw);
                 }
             },
 

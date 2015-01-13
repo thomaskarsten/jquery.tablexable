@@ -579,3 +579,47 @@ QUnit.test('pagination + filtering: pagination gets updated after new' +
         ['17', '<a href="3">c</a>']
     ]);
 });
+
+QUnit.test('sorting keeps the filters alive', function() {
+
+    var $rows;
+
+    var confirmElementHasClasses = function($element, classes) {
+        for (var i = 0; i < classes.length; i++)
+            ok($element.hasClass(classes[i]));
+    };
+
+    this.clickFilter1();
+
+    this.sortByColumn1();
+    $rows = this.$obj.find('tbody tr');
+    confirmElementHasClasses($rows.eq(0), ['pgnCurrentPage', 'byFilter0']);
+    confirmElementHasClasses($rows.eq(1), ['pgnCurrentPage', 'byFilter0']);
+    confirmElementHasClasses($rows.eq(2), ['pgnOtherPage', 'filtered']);
+    confirmElementHasClasses($rows.eq(3), ['pgnOtherPage', 'byFilter0']);
+
+    this.sortByColumn2();
+    $rows = this.$obj.find('tbody tr');
+    confirmElementHasClasses($rows.eq(0), ['pgnCurrentPage', 'byFilter0']);
+    confirmElementHasClasses($rows.eq(1), ['pgnCurrentPage', 'byFilter0']);
+    confirmElementHasClasses($rows.eq(2), ['pgnOtherPage', 'byFilter0']);
+    confirmElementHasClasses($rows.eq(3), ['pgnOtherPage', 'filtered']);
+
+    this.clickFilter2();
+
+    this.sortByColumn1();
+    $rows = this.$obj.find('tbody tr');
+    confirmElementHasClasses($rows.eq(0), ['pgnCurrentPage', 'byFilter0', 'byFilter1']);
+    confirmElementHasClasses($rows.eq(1), ['pgnCurrentPage', 'byFilter0']);
+    confirmElementHasClasses($rows.eq(2), ['pgnOtherPage', 'filtered']);
+    confirmElementHasClasses($rows.eq(3), ['pgnOtherPage', 'byFilter0']);
+
+    this.clickFilter1();
+
+    this.sortByColumn2();
+    $rows = this.$obj.find('tbody tr');
+    confirmElementHasClasses($rows.eq(0), ['pgnCurrentPage', 'byFilter1']);
+    confirmElementHasClasses($rows.eq(1), ['pgnOtherPage', 'filtered']);
+    confirmElementHasClasses($rows.eq(2), ['pgnOtherPage', 'filtered']);
+    confirmElementHasClasses($rows.eq(3), ['pgnOtherPage', 'filtered']);
+});
