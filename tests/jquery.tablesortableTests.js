@@ -352,8 +352,8 @@ QUnit.module('jquery.filterable', {
     beforeEach: function() {
         this.$obj = $('#filterable').filterable({
             hideColumns: [
-                {column: 1, condition: 'False', text: this.FILTER1_TEXT},
-                {column: 2, condition: 'False', text: this.FILTER2_TEXT}
+                {column: 1, condition: 'True', text: this.FILTER1_TEXT},
+                {column: 2, condition: 'True', text: this.FILTER2_TEXT}
             ],
             container: $('#filterable tbody')
         });
@@ -392,13 +392,27 @@ QUnit.test('settings', function() {
 });
 
 QUnit.test('clicking filter checkbox works as expected', function() {
+    var $rows = this.$obj.find('tbody tr');
+
     this.clickFilter1();
-    var $filtered = this.$obj.find('tbody tr.filtered');
-    equal($filtered.length, 1);
+    equal($rows.eq(0).attr('class'), 'byFilter0');
+    equal($rows.eq(1).attr('class'), 'filtered');
+    equal($rows.eq(2).attr('class'), 'byFilter0');
 
     this.clickFilter2();
-    var $filtered = this.$obj.find('tbody tr.filtered');
-    equal($filtered.length, 2);
+    equal($rows.eq(0).attr('class'), 'byFilter0');
+    equal($rows.eq(1).attr('class'), 'filtered');
+    equal($rows.eq(2).attr('class'), 'byFilter0 byFilter1');
+
+    this.clickFilter1();
+    equal($rows.eq(0).attr('class'), 'filtered');
+    equal($rows.eq(1).attr('class'), 'filtered');
+    equal($rows.eq(2).attr('class'), 'byFilter1');
+
+    this.clickFilter2();
+    equal($rows.eq(0).attr('class'), '');
+    equal($rows.eq(1).attr('class'), '');
+    equal($rows.eq(2).attr('class'), '');
 });
 
 QUnit.test('clicking filter checkbox checks related checkboxes in different' +
@@ -432,17 +446,6 @@ QUnit.test('unclicking filter checkbox resets filtered items', function() {
     equal(this.$obj.find('tbody tr.filtered').length, 0);
 });
 
-QUnit.test('multiple filters use different additional CSS classes', function() {
-    this.clickFilter1();
-    equal(this.$obj.find('tbody tr.filtered').length, 1);
-    this.clickFilter2();
-    equal(this.$obj.find('tbody tr.filtered').length, 2);
-    this.clickFilter2();
-    equal(this.$obj.find('tbody tr.filtered').length, 1);
-    this.clickFilter1();
-    equal(this.$obj.find('tbody tr.filtered').length, 0);
-});
-
 QUnit.module('jquery.tablesortable.paginatable.filterable', {
     $obj: '',
     $firstColumnHeader: '',
@@ -460,8 +463,8 @@ QUnit.module('jquery.tablesortable.paginatable.filterable', {
             container: $('#myTable tbody')
         }).filterable({
             hideColumns: [
-                {column: 2, condition: 'False', text: this.FILTER1_TEXT},
-                {column: 3, condition: 'False', text: this.FILTER2_TEXT}
+                {column: 2, condition: 'True', text: this.FILTER1_TEXT},
+                {column: 3, condition: 'True', text: this.FILTER2_TEXT}
             ],
             container: $('#myTable tbody')
         });
