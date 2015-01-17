@@ -5,7 +5,7 @@
 
         var settings = $.extend({
             container: '',
-            containerForNavigation: '',
+            containersForNavigation: '',
             hideColumns: ''
         }, methodOrOptions || []);
 
@@ -21,8 +21,8 @@
                     this.data('container', settings.container);
                 else
                     this.data('container', this);
-                if (settings.containerForNavigation)
-                    methods.$btnContainers = settings.containerForNavigation;
+                if (settings.containersForNavigation)
+                    methods.$btnContainers = settings.containersForNavigation;
                 else {
                     var navigation = '<div class="' + navClass + '"></div>';
                     this.after(navigation);

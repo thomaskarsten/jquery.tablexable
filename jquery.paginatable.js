@@ -6,7 +6,7 @@
         var settings = $.extend({
             nItemsPerPage: 10,
             container: '',
-            containerForNavigation: '',
+            containersForNavigation: '',
             sigRefreshPages: 'tablesortable.sorted ' + SIG_REFRESH
         }, methodOrOptions || []);
 
@@ -21,8 +21,8 @@
 
                 var navClass = 'pgnNavigation';
                 var $btnContainers;
-                if (settings.containerForNavigation)
-                    $btnContainers = settings.containerForNavigation;
+                if (settings.containersForNavigation)
+                    $btnContainers = settings.containersForNavigation;
                 else {
                     var navigation = '<div class="' + navClass + '"></div>';
                     this.after(navigation);
@@ -50,12 +50,13 @@
                 else
                     this.data('container', this);
                 var $pgnNavigation;
-                if (settings.containerForNavigation) {
-                    this.data('containerForNavigation', settings.containerForNavigation);
-                    $pgnNavigation = settings.containerForNavigation;
+                if (settings.containersForNavigation) {
+                    this.data('containersForNavigation',
+                        settings.containersForNavigation);
+                    $pgnNavigation = settings.containersForNavigation;
                 } else {
                     $pgnNavigation = $('.pgnNavigation');
-                    this.data('containerForNavigation', $pgnNavigation);
+                    this.data('containersForNavigation', $pgnNavigation);
                 }
 
                 this.data('$pgnCurrent', $pgnNavigation.find('.pgnCurrent'));
